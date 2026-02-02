@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arthav Infra Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Remove arrows from number inputs */
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .success-toast { transform: translateY(0); opacity: 1; transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="bg-[#F8F9FA] text-[#1A1A1A] min-h-screen">
+
+    <div class="max-w-5xl mx-auto px-6 py-12">
+        <header class="mb-12 border-b border-gray-200 pb-8 flex justify-between items-end">
+            <div>
+                <h1 class="text-2xl font-semibold tracking-tight uppercase">Arthav Infra Calculator</h1>
+                <p class="text-gray-500 mt-2 font-light text-sm">Precision calculators for development and leasing.</p>
+            </div>
+            <div id="copy-toast" class="hidden text-[#001F3F] text-xs font-semibold uppercase tracking-widest bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
+                Summary Copied
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <div class="md:col-span-8 bg-white border border-gray-200 p-8 rounded-sm shadow-sm">
+                <h2 class="text-xs font-semibold uppercase tracking-widest text-[#001F3F] mb-6 border-l-2 border-[#001F3F] pl-3">Loan EMI Calculator</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-xs uppercase text-gray-400 mb-2">Principal Amount (₹)</label>
+                            <input type="text" id="p_amount" value="50,00,000" oninput="formatCurrency(this); calculateEMI();" 
+                                class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-400 mb-2">Interest Rate (% p.a.)</label>
+                            <input type="number" id="p_rate" value="8" step="0.1" oninput="calculateEMI()"
+                                class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs uppercase text-gray-400 mb-2">Tenure (Years)</label>
+                            <input type="number" id="p_years" value="12" oninput="calculateEMI()"
+                                class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light transition-colors">
+                        </div>
+                    </div>
+
+                    <div class="bg-[#FBFBFB] p-8 flex flex-col justify-center items-center rounded-sm border border-gray-50">
+                        <span class="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Monthly Installment</span>
+                        <div class="text-4xl font-light text-[#001F3F]">₹ <span id="emi_result">0</span></div>
+                        <div class="mt-8 pt-6 border-t border-gray-100 w-full text-center">
+                            <span class="text-xs text-gray-400 font-light tracking-wide">Total Interest: <span class="text-gray-600 font-normal">₹ <span id="total_interest">0</span></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-4 bg-white border border-gray-200 p-8 rounded-sm shadow-sm flex flex-col">
+                <h2 class="text-xs font-semibold uppercase tracking-widest text-[#001F3F] mb-6 border-l-2 border-[#001F3F] pl-3">Area Converter</h2>
+                
+                <div class="space-y-6 flex-grow">
+                    <div>
+                        <label class="block text-xs uppercase text-gray-400 mb-2">Value</label>
+                        <input type="number" id="area_val" value="1000" oninput="convertArea()"
+                            class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light transition-colors">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] uppercase text-gray-400 mb-1 tracking-tighter">From</label>
+                            <select id="area_from" onchange="convertArea()" class="w-full bg-transparent border-b border-gray-200 py-2 outline-none text-sm font-light">
+                                <option value="sqft">Sq. Ft.</option>
+                                <option value="gaj">Gaj (Sq. Yd)</option>
+                                <option value="sqmtr">Sq. Mtr.</option>
+                                <option value="acre">Acre</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase text-gray-400 mb-1 tracking-tighter">To</label>
+                            <select id="area_to" onchange="convertArea()" class="w-full bg-transparent border-b border-gray-200 py-2 outline-none text-sm font-light">
+                                <option value="sqft">Sq. Ft.</option>
+                                <option value="gaj" selected>Gaj (Sq. Yd)</option>
+                                <option value="sqmtr">Sq. Mtr.</option>
+                                <option value="acre">Acre</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 bg-[#001F3F] text-white p-6 rounded-sm text-center">
+                    <span class="block text-[10px] uppercase tracking-[0.2em] opacity-60 mb-1">Converted Result</span>
+                    <span class="text-2xl font-light" id="area_result">0.00</span>
+                </div>
+            </div>
+
+            <div class="md:col-span-12 flex justify-end">
+                <button onclick="copySummary()" class="group flex items-center space-x-3 bg-white border border-[#001F3F] text-[#001F3F] px-8 py-3 rounded-sm text-xs font-semibold uppercase tracking-widest hover:bg-[#001F3F] hover:text-white transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                    </svg>
+                    <span>Copy Summary to Clipboard</span>
+                </button>
+            </div>
+
+        </div>
+
+        <footer class="mt-12 text-center">
+            <p class="text-[10px] uppercase tracking-[0.2em] text-gray-300">Internal Use Only — Ashwin Kumar Agarwal</p>
+        </footer>
+    </div>
+
+    <script>
+        function formatCurrency(input) {
+            let value = input.value.replace(/\D/g, "");
+            if (value !== "") {
+                input.value = Number(value).toLocaleString('en-IN');
+            } else {
+                input.value = "";
+            }
+        }
+
+        function calculateEMI() {
+            const pStr = document.getElementById('p_amount').value.replace(/,/g, "");
+            const P = parseFloat(pStr);
+            const annualRate = parseFloat(document.getElementById('p_rate').value);
+            const years = parseFloat(document.getElementById('p_years').value);
+
+            if (P && annualRate && years) {
+                const r = annualRate / 12 / 100;
+                const n = years * 12;
+                const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                const totalPayment = emi * n;
+                
+                document.getElementById('emi_result').innerText = Math.round(emi).toLocaleString('en-IN');
+                document.getElementById('total_interest').innerText = Math.round(totalPayment - P).toLocaleString('en-IN');
+            }
+        }
+
+        function convertArea() {
+            const val = parseFloat(document.getElementById('area_val').value);
+            const from = document.getElementById('area_from').value;
+            const to = document.getElementById('area_to').value;
+
+            const factors = {
+                sqft: 1,
+                gaj: 9,
+                sqmtr: 10.7639,
+                acre: 43560
+            };
+
+            if (val) {
+                const inSqft = val * factors[from];
+                const result = inSqft / factors[to];
+                document.getElementById('area_result').innerText = result.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+        }
+
+        function copySummary() {
+            const emi = document.getElementById('emi_result').innerText;
+            const interest = document.getElementById('total_interest').innerText;
+            const areaRes = document.getElementById('area_result').innerText;
+            const areaFrom = document.getElementById('area_from').selectedOptions[0].text;
+            const areaTo = document.getElementById('area_to').selectedOptions[0].text;
+            const areaVal = document.getElementById('area_val').value;
+
+            const summary = `REAL ESTATE CALCULATION SUMMARY\n` +
+                            `------------------------------\n` +
+                            `LOAN DETAILS:\n` +
+                            `- Monthly EMI: ₹${emi}\n` +
+                            `- Total Interest: ₹${interest}\n\n` +
+                            `AREA CONVERSION:\n` +
+                            `- Original: ${areaVal} ${areaFrom}\n` +
+                            `- Converted: ${areaRes} ${areaTo}\n` +
+                            `------------------------------\n` +
+                            `Generated via RE Toolbox`;
+
+            navigator.clipboard.writeText(summary).then(() => {
+                const toast = document.getElementById('copy-toast');
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 2000);
+            });
+        }
+
+        window.onload = () => {
+            calculateEMI();
+            convertArea();
+        };
+    </script>
+</body>
+</html>
