@@ -9,6 +9,7 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .data-row:last-child { border-bottom: none; }
     </style>
 </head>
 <body class="bg-[#F8F9FA] text-[#1A1A1A] min-h-screen">
@@ -16,112 +17,113 @@
     <div class="max-w-6xl mx-auto px-6 py-12">
         <header class="mb-12 border-b border-gray-200 pb-8 flex justify-between items-end">
             <div>
-                <h1 class="text-2xl font-semibold tracking-tight uppercase">Real Estate Suite</h1>
-                <p class="text-gray-500 mt-2 font-light text-sm">Precision calculators for development and leasing.</p>
+                <h1 class="text-2xl font-semibold tracking-tight uppercase">Arthav Infra Calculator</h1>
+                <p class="text-gray-500 mt-2 font-light text-sm">Lease underwriting and yield projection for development assets.</p>
             </div>
             <div id="copy-toast" class="hidden text-[#001F3F] text-xs font-semibold uppercase tracking-widest bg-blue-50 px-4 py-2 rounded-full border border-blue-100">
-                Summary Copied
+                Data Compiled & Copied
             </div>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
             
             <div class="md:col-span-8 bg-white border border-gray-200 p-8 rounded-sm shadow-sm">
-                <h2 class="text-xs font-semibold uppercase tracking-widest text-[#001F3F] mb-6 border-l-2 border-[#001F3F] pl-3">Loan EMI Calculator</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <h2 class="text-xs font-semibold uppercase tracking-widest text-[#001F3F] mb-8 border-l-2 border-[#001F3F] pl-3">Lease Underwriting & Yield</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <div class="space-y-6">
-                        <div>
-                            <label class="block text-xs uppercase text-gray-400 mb-2">Principal Amount (₹)</label>
-                            <input type="text" id="p_amount" value="50,00,000" oninput="formatCurrency(this); calculateEMI();" 
-                                class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light">
-                        </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs uppercase text-gray-400 mb-2">Rate (%)</label>
-                                <input type="number" id="p_rate" value="8.5" step="0.1" oninput="calculateEMI()"
-                                    class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light">
+                                <label class="block text-[10px] uppercase text-gray-400 mb-1">Leasable Area (SF)</label>
+                                <input type="text" id="lease_area" value="10,000" oninput="formatCurrency(this); runLeaseCalculations();" 
+                                    class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-1 text-md font-light">
                             </div>
                             <div>
-                                <label class="block text-xs uppercase text-gray-400 mb-2">Years</label>
-                                <input type="number" id="p_years" value="20" oninput="calculateEMI()"
-                                    class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light">
+                                <label class="block text-[10px] uppercase text-gray-400 mb-1">Rent / SF / Month</label>
+                                <input type="number" id="rent_psf" value="65" oninput="runLeaseCalculations();" 
+                                    class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-1 text-md font-light">
                             </div>
                         </div>
+                        <div class="pt-4 border-t border-gray-50">
+                            <label class="block text-[10px] uppercase text-gray-400 mb-1">Total Cost / SF (Land + Const)</label>
+                            <input type="text" id="cost_psf" value="8,500" oninput="formatCurrency(this); runLeaseCalculations();" 
+                                class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-1 text-md font-light text-blue-800">
+                        </div>
                     </div>
-                    <div class="bg-[#FBFBFB] p-6 flex flex-col justify-center items-center rounded-sm border border-gray-50">
-                        <span class="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Monthly EMI</span>
-                        <div class="text-3xl font-light text-[#001F3F]">₹ <span id="emi_result">0</span></div>
-                        <div class="mt-4 pt-4 border-t border-gray-100 w-full text-center">
-                            <span class="text-[10px] text-gray-400">Total Interest: ₹ <span id="total_interest">0</span></span>
+
+                    <div class="bg-[#FBFBFB] p-6 rounded-sm border border-gray-50 flex flex-col justify-between">
+                        <div>
+                            <span class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Gross Annual Rent</span>
+                            <div class="text-2xl font-light text-[#001F3F]">₹ <span id="annual_rent_res">0</span></div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <span class="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Projected Annual Yield</span>
+                            <div class="text-3xl font-semibold text-[#001F3F]"><span id="yield_res">0</span>%</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="md:col-span-4 bg-white border border-gray-200 p-8 rounded-sm shadow-sm">
-                <h2 class="text-xs font-semibold uppercase tracking-widest text-[#001F3F] mb-6 border-l-2 border-[#001F3F] pl-3">Area Converter</h2>
-                <div class="space-y-6">
-                    <input type="number" id="area_val" value="1000" oninput="convertArea()"
-                        class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light">
-                    <div class="grid grid-cols-2 gap-4">
-                        <select id="area_from" onchange="convertArea()" class="bg-transparent border-b border-gray-200 py-2 outline-none text-xs uppercase">
-                            <option value="sqft">Sq. Ft.</option>
+            <div class="md:col-span-4 space-y-6">
+                <div class="bg-white border border-gray-200 p-6 rounded-sm shadow-sm">
+                    <h2 class="text-[10px] font-semibold uppercase text-gray-400 mb-4">Quick Area Conv.</h2>
+                    <input type="number" id="area_val" value="1000" oninput="convertArea()" class="w-full border-b mb-3 outline-none text-sm">
+                    <div class="flex justify-between items-center text-xs">
+                        <span id="area_result" class="font-bold text-[#001F3F]">0.00</span>
+                        <select id="area_to" onchange="convertArea()" class="bg-transparent outline-none uppercase text-[10px]">
                             <option value="gaj">Gaj</option>
-                            <option value="sqmtr">Sq. Mtr.</option>
-                            <option value="acre">Acre</option>
-                        </select>
-                        <select id="area_to" onchange="convertArea()" class="bg-transparent border-b border-gray-200 py-2 outline-none text-xs uppercase">
-                            <option value="sqft">Sq. Ft.</option>
-                            <option value="gaj" selected>Gaj</option>
-                            <option value="sqmtr">Sq. Mtr.</option>
+                            <option value="sqmtr">SqM</option>
                             <option value="acre">Acre</option>
                         </select>
                     </div>
-                    <div class="bg-[#001F3F] text-white p-4 text-center mt-4">
-                        <span class="text-xl font-light" id="area_result">0.00</span>
-                    </div>
+                </div>
+                <div class="bg-[#001F3F] text-white p-6 rounded-sm shadow-sm">
+                    <h2 class="text-[10px] font-semibold uppercase opacity-60 mb-4">GST Quick Check (18%)</h2>
+                    <input type="text" id="gst_amount" value="1,00,000" oninput="formatCurrency(this); calculateGST();" class="bg-transparent border-b border-white/20 w-full outline-none mb-3 text-white">
+                    <div class="text-[10px] opacity-80 uppercase tracking-tighter">Base: ₹ <span id="gst_minus">0</span></div>
                 </div>
             </div>
 
-            <div class="md:col-span-12 lg:col-span-12 bg-white border border-gray-200 p-8 rounded-sm shadow-sm mt-2">
-                <h2 class="text-xs font-semibold uppercase tracking-widest text-[#001F3F] mb-6 border-l-2 border-[#001F3F] pl-3">GST Calculator (Inclusive / Exclusive)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-2">Transaction Amount (₹)</label>
-                        <input type="text" id="gst_amount" value="1,00,000" oninput="formatCurrency(this); calculateGST();" 
-                            class="w-full border-b border-gray-200 focus:border-[#001F3F] outline-none py-2 text-lg font-light">
-                    </div>
-                    <div>
-                        <label class="block text-xs uppercase text-gray-400 mb-2">GST Rate (%)</label>
-                        <select id="gst_rate" onchange="calculateGST()" class="w-full bg-transparent border-b border-gray-200 py-2 outline-none text-lg font-light">
-                            <option value="5">5%</option>
-                            <option value="12">12%</option>
-                            <option value="18" selected>18%</option>
-                            <option value="28">28%</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-gray-50 p-4 rounded-sm border border-gray-100">
-                            <span class="block text-[10px] uppercase text-gray-400 mb-1">Plus GST</span>
-                            <div class="text-lg text-[#001F3F] font-semibold">₹ <span id="gst_plus">0</span></div>
+            <div class="md:col-span-12 bg-white border border-gray-200 p-8 rounded-sm shadow-sm">
+                <div class="flex justify-between items-center mb-8 border-l-2 border-[#001F3F] pl-3">
+                    <h2 class="text-xs font-semibold uppercase tracking-widest text-[#001F3F]">Yearly Rent Roll Projection</h2>
+                    <div class="flex space-x-6">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] uppercase text-gray-400">Escalation %</span>
+                            <input type="number" id="esc_rate" value="15" oninput="runLeaseCalculations();" class="w-12 border-b outline-none text-center text-xs">
                         </div>
-                        <div class="bg-gray-50 p-4 rounded-sm border border-gray-100">
-                            <span class="block text-[10px] uppercase text-gray-400 mb-1">Less GST (Base)</span>
-                            <div class="text-lg text-slate-600 font-semibold">₹ <span id="gst_minus">0</span></div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] uppercase text-gray-400">Interval (Yrs)</span>
+                            <input type="number" id="esc_interval" value="3" oninput="runLeaseCalculations();" class="w-12 border-b outline-none text-center text-xs">
                         </div>
                     </div>
                 </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-[10px] uppercase text-gray-400 border-b border-gray-100">
+                                <th class="pb-4 font-medium">Year</th>
+                                <th class="pb-4 font-medium">Monthly Rent</th>
+                                <th class="pb-4 font-medium">Annual Income</th>
+                                <th class="pb-4 font-medium text-right">Cumulative Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rent_roll_body" class="text-sm font-light">
+                            </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="md:col-span-12 flex justify-end mt-4">
-                <button onclick="copySummary()" class="flex items-center space-x-3 bg-white border border-[#001F3F] text-[#001F3F] px-8 py-3 rounded-sm text-xs font-semibold uppercase tracking-widest hover:bg-[#001F3F] hover:text-white transition-all">
-                    <span>Copy Summary</span>
+            <div class="md:col-span-12 flex justify-end">
+                <button onclick="copySummary()" class="bg-[#001F3F] text-white px-10 py-4 rounded-sm text-[10px] font-semibold uppercase tracking-[0.2em] hover:bg-black transition-all">
+                    Compile Full Underwriting Report
                 </button>
             </div>
         </div>
 
         <footer class="mt-12 text-center text-[10px] uppercase tracking-[0.2em] text-gray-300">
-            Internal Use Only — Ashwin Kumar Agarwal
+            Proprietary Underwriting Tool — Ashwin Kumar Agarwal
         </footer>
     </div>
 
@@ -132,49 +134,59 @@
             else input.value = "";
         }
 
-        function calculateEMI() {
-            const P = parseFloat(document.getElementById('p_amount').value.replace(/,/g, ""));
-            const r = parseFloat(document.getElementById('p_rate').value) / 12 / 100;
-            const n = parseFloat(document.getElementById('p_years').value) * 12;
-            if (P && r && n) {
-                const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-                document.getElementById('emi_result').innerText = Math.round(emi).toLocaleString('en-IN');
-                document.getElementById('total_interest').innerText = Math.round((emi * n) - P).toLocaleString('en-IN');
-            }
-        }
+        function runLeaseCalculations() {
+            const area = parseFloat(document.getElementById('lease_area').value.replace(/,/g, "")) || 0;
+            const psf = parseFloat(document.getElementById('rent_psf').value) || 0;
+            const costPsf = parseFloat(document.getElementById('cost_psf').value.replace(/,/g, "")) || 0;
+            const escRate = parseFloat(document.getElementById('esc_rate').value) / 100 || 0;
+            const interval = parseInt(document.getElementById('esc_interval').value) || 1;
 
-        function convertArea() {
-            const val = parseFloat(document.getElementById('area_val').value);
-            const from = document.getElementById('area_from').value;
-            const to = document.getElementById('area_to').value;
-            const factors = { sqft: 1, gaj: 9, sqmtr: 10.7639, acre: 43560 };
-            if (val) {
-                const res = (val * factors[from]) / factors[to];
-                document.getElementById('area_result').innerText = res.toLocaleString(undefined, {minimumFractionDigits: 2});
+            const monthlyBase = area * psf;
+            const annualBase = monthlyBase * 12;
+            const totalCapex = area * costPsf;
+            const yield = totalCapex > 0 ? (annualBase / totalCapex) * 100 : 0;
+
+            document.getElementById('annual_rent_res').innerText = Math.round(annualBase).toLocaleString('en-IN');
+            document.getElementById('yield_res').innerText = yield.toFixed(2);
+
+            // Rent Roll Projection
+            let tableHTML = '';
+            let cumulative = 0;
+            let currentMonthly = monthlyBase;
+
+            for (let year = 1; year <= 9; year++) {
+                if (year > 1 && (year - 1) % interval === 0) {
+                    currentMonthly = currentMonthly * (1 + escRate);
+                }
+                const yearAnnual = currentMonthly * 12;
+                cumulative += yearAnnual;
+
+                tableHTML += `<tr class="border-b border-gray-50 data-row">
+                    <td class="py-4 font-medium text-[#001F3F]">Year ${year}</td>
+                    <td class="py-4 text-gray-600">₹ ${Math.round(currentMonthly).toLocaleString('en-IN')}</td>
+                    <td class="py-4 text-gray-600">₹ ${Math.round(yearAnnual).toLocaleString('en-IN')}</td>
+                    <td class="py-4 text-right font-semibold">₹ ${Math.round(cumulative).toLocaleString('en-IN')}</td>
+                </tr>`;
             }
+            document.getElementById('rent_roll_body').innerHTML = tableHTML;
         }
 
         function calculateGST() {
-            const amount = parseFloat(document.getElementById('gst_amount').value.replace(/,/g, ""));
-            const rate = parseFloat(document.getElementById('gst_rate').value);
-            if (amount && rate) {
-                // Forward GST (Amount + GST)
-                const plusGst = amount + (amount * rate / 100);
-                // Reverse GST (Base Value = Amount / (1 + Rate%))
-                const baseValue = amount / (1 + (rate / 100));
-                
-                document.getElementById('gst_plus').innerText = Math.round(plusGst).toLocaleString('en-IN');
-                document.getElementById('gst_minus').innerText = Math.round(baseValue).toLocaleString('en-IN');
-            }
+            const amount = parseFloat(document.getElementById('gst_amount').value.replace(/,/g, "")) || 0;
+            document.getElementById('gst_minus').innerText = Math.round(amount / 1.18).toLocaleString('en-IN');
+        }
+
+        function convertArea() {
+            const val = parseFloat(document.getElementById('area_val').value) || 0;
+            const to = document.getElementById('area_to').value;
+            const factors = { gaj: 9, sqmtr: 10.7639, acre: 43560 };
+            document.getElementById('area_result').innerText = (val / factors[to]).toLocaleString(undefined, {maximumFractionDigits: 2});
         }
 
         function copySummary() {
-            const emi = document.getElementById('emi_result').innerText;
-            const area = document.getElementById('area_result').innerText;
-            const gstPlus = document.getElementById('gst_plus').innerText;
-            const gstBase = document.getElementById('gst_minus').innerText;
-            
-            const summary = `RE SUMMARY:\nEMI: ₹${emi}\nArea: ${area}\nGST Inclusive: ₹${gstPlus}\nGST Base: ₹${gstBase}`;
+            const yield = document.getElementById('yield_res').innerText;
+            const ann = document.getElementById('annual_rent_res').innerText;
+            const summary = `UNDERWRITING SUMMARY\nGross Annual Rent: ₹${ann}\nTarget Yield: ${yield}%\nProjection: 9-Year Rent Roll generated successfully.`;
             navigator.clipboard.writeText(summary).then(() => {
                 const toast = document.getElementById('copy-toast');
                 toast.classList.remove('hidden');
@@ -182,7 +194,7 @@
             });
         }
 
-        window.onload = () => { calculateEMI(); convertArea(); calculateGST(); };
+        window.onload = () => { runLeaseCalculations(); calculateGST(); convertArea(); };
     </script>
 </body>
 </html>
