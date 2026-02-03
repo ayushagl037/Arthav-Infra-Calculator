@@ -1,2 +1,2 @@
 # Arthav-Infra-Calculator
-Tool to calculate EMI and Area Conversion
+Tool to calculate EMI, GST and Area Conversion
